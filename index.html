@@ -1,89 +1,108 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Monitor</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.10.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.10.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+<div id="loadscr">
+  <div class="spin"></div>
+  <div class="ltxt">Menghubungkan ke Firebase...</div>
+</div>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+<header>
+  <div class="logo"><div class="dot"></div>PANEL MONITOR</div>
+  <div class="hright">Update: <span id="lupdate">—</span></div>
+</header>
+
+<main>
+  <div class="notice" id="notice"></div>
+
+  <div class="stitle">Sensor Realtime</div>
+  <div class="cards">
+    <div class="card" style="--cc:#f87171"><div class="clabel">Suhu</div><div class="cval" id="v-suhu">—</div><div class="cunit">°C</div></div>
+    <div class="card" style="--cc:#60a5fa"><div class="clabel">Kelembapan</div><div class="cval" id="v-humid">—</div><div class="cunit">%</div></div>
+    <div class="card" style="--cc:#fbbf24"><div class="clabel">Tegangan</div><div class="cval" id="v-teg">—</div><div class="cunit">V</div></div>
+    <div class="card" style="--cc:#34d399"><div class="clabel">Arus</div><div class="cval" id="v-arus">—</div><div class="cunit">A</div></div>
+    <div class="card" style="--cc:#a78bfa"><div class="clabel">Daya</div><div class="cval" id="v-daya">—</div><div class="cunit">W</div></div>
+    <div class="card" style="--cc:#fb923c"><div class="clabel">KWh/hari</div><div class="cval" id="v-kwhh">—</div><div class="cunit">kWh</div></div>
+    <div class="card" style="--cc:#06b6d4"><div class="clabel">KWh/bulan</div><div class="cval" id="v-kwhb">—</div><div class="cunit">kWh</div></div>
+  </div>
+
+  <div class="stitle">IR Sensor</div>
+  <div class="ir-grid">
+    <div class="irc" id="ir1"><div class="irdot"></div><div class="irlbl">IR 1</div><div class="irstat">—</div></div>
+    <div class="irc" id="ir2"><div class="irdot"></div><div class="irlbl">IR 2</div><div class="irstat">—</div></div>
+    <div class="irc" id="ir3"><div class="irdot"></div><div class="irlbl">IR 3</div><div class="irstat">—</div></div>
+    <div class="irc" id="ir4"><div class="irdot"></div><div class="irlbl">IR 4</div><div class="irstat">—</div></div>
+  </div>
+
+  <div class="stitle">Network Monitoring</div>
+  <div class="cards" style="margin-bottom:24px">
+    <div class="card" style="--cc:#22c55e"><div class="clabel">RSSI</div><div class="cval" id="v-rssi">—</div><div class="cunit">dBm</div></div>
+    <div class="card" style="--cc:#3b82f6"><div class="clabel">Delay</div><div class="cval" id="v-delay">—</div><div class="cunit">ms</div></div>
+    <div class="card" style="--cc:#f59e0b"><div class="clabel">Throughput</div><div class="cval" id="v-throughput">—</div><div class="cunit">kbps</div></div>
+    <div class="card" style="--cc:#ef4444"><div class="clabel">Packet Loss</div><div class="cval" id="v-packetloss">—</div><div class="cunit">%</div></div>
+    <div class="card" style="--cc:#a78bfa"><div class="clabel">Kualitas Sinyal</div><div class="cval" id="v-rssi-quality" style="font-size:14px">—</div><div class="cunit" id="v-rssi-desc">—</div></div>
+  </div>
+
+  <div class="stitle">Grafik</div>
+  <div class="twocol">
+    <div class="panel">
+      <div class="ph">
+        <div class="ptitle">Suhu & Kelembapan</div>
+        <div class="tabs" id="t-sh">
+          <button class="tab active" onclick="sw('sh',this,'suhu')">Suhu</button>
+          <button class="tab" onclick="sw('sh',this,'humid')">Humid</button>
+          <button class="tab" onclick="sw('sh',this,'both')">Keduanya</button>
+        </div>
+      </div>
+      <canvas id="csh" height="170"></canvas>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <div class="panel">
+      <div class="ph">
+        <div class="ptitle">Kelistrikan</div>
+        <div class="tabs" id="t-el">
+          <button class="tab active" onclick="sw('el',this,'daya')">Daya</button>
+          <button class="tab" onclick="sw('el',this,'tegangan')">Tegangan</button>
+          <button class="tab" onclick="sw('el',this,'arus')">Arus</button>
+        </div>
+      </div>
+      <canvas id="cel" height="170"></canvas>
+    </div>
+  </div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+  <div class="logpanel">
+    <div class="logh">
+      <div class="logtitle">Log Historis</div>
+      <div class="ebtns">
+        <button class="btn bcsv" onclick="exportCSV()">Export CSV</button>
+        <button class="btn bxls" onclick="exportXLSX()">Export Excel</button>
+      </div>
+    </div>
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th>Waktu</th><th>Suhu°C</th><th>Humid%</th>
+          <th>V</th><th>A</th><th>W</th><th>KWh/hari</th>
+          <th>IR1</th><th>IR2</th><th>IR3</th><th>IR4</th>
+          <th>RSSI(dBm)</th><th>Delay(ms)</th><th>Throughput(kbps)</th><th>Pkt Loss%</th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="11" class="nodata">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
-  </body>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
 </html>
