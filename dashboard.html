@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Monitor</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="loadscr">
+  <div class="spin"></div>
+  <div class="ltxt">Menghubungkan ke Firebase...</div>
+</div>
+
+<header>
+  <div class="logo"><div class="dot"></div>PANEL MONITOR</div>
+  <div class="hright">Update: <span id="lupdate">—</span></div>
+</header>
+
+<main>
+  <div class="notice" id="notice"></div>
+
+  <div class="stitle">Sensor Realtime</div>
+  <div class="cards">
+    <div class="card" style="--cc:#f87171"><div class="clabel">Suhu</div><div class="cval" id="v-suhu">—</div><div class="cunit">°C</div></div>
+    <div class="card" style="--cc:#60a5fa"><div class="clabel">Kelembapan</div><div class="cval" id="v-humid">—</div><div class="cunit">%</div></div>
+    <div class="card" style="--cc:#fbbf24"><div class="clabel">Tegangan</div><div class="cval" id="v-teg">—</div><div class="cunit">V</div></div>
+    <div class="card" style="--cc:#34d399"><div class="clabel">Arus</div><div class="cval" id="v-arus">—</div><div class="cunit">A</div></div>
+    <div class="card" style="--cc:#a78bfa"><div class="clabel">Daya</div><div class="cval" id="v-daya">—</div><div class="cunit">W</div></div>
+    <div class="card" style="--cc:#fb923c"><div class="clabel">KWh/hari</div><div class="cval" id="v-kwhh">—</div><div class="cunit">kWh</div></div>
+    <div class="card" style="--cc:#06b6d4"><div class="clabel">KWh/bulan</div><div class="cval" id="v-kwhb">—</div><div class="cunit">kWh</div></div>
+  </div>
+
+  <div class="stitle">IR Sensor</div>
+  <div class="ir-grid">
+    <div class="irc" id="ir1"><div class="irdot"></div><div class="irlbl">IR 1</div><div class="irstat">—</div></div>
+    <div class="irc" id="ir2"><div class="irdot"></div><div class="irlbl">IR 2</div><div class="irstat">—</div></div>
+    <div class="irc" id="ir3"><div class="irdot"></div><div class="irlbl">IR 3</div><div class="irstat">—</div></div>
+    <div class="irc" id="ir4"><div class="irdot"></div><div class="irlbl">IR 4</div><div class="irstat">—</div></div>
+  </div>
+
+  <div class="stitle">Network Monitoring</div>
+  <div class="cards" style="margin-bottom:24px">
+    <div class="card" style="--cc:#22c55e"><div class="clabel">RSSI</div><div class="cval" id="v-rssi">—</div><div class="cunit">dBm</div></div>
+    <div class="card" style="--cc:#3b82f6"><div class="clabel">Delay</div><div class="cval" id="v-delay">—</div><div class="cunit">ms</div></div>
+    <div class="card" style="--cc:#f59e0b"><div class="clabel">Throughput</div><div class="cval" id="v-throughput">—</div><div class="cunit">kbps</div></div>
+    <div class="card" style="--cc:#ef4444"><div class="clabel">Packet Loss</div><div class="cval" id="v-packetloss">—</div><div class="cunit">%</div></div>
+    <div class="card" style="--cc:#a78bfa"><div class="clabel">Kualitas Sinyal</div><div class="cval" id="v-rssi-quality" style="font-size:14px">—</div><div class="cunit" id="v-rssi-desc">—</div></div>
+  </div>
+
+  <div class="stitle">Grafik</div>
+  <div class="twocol">
+    <div class="panel">
+      <div class="ph">
+        <div class="ptitle">Suhu & Kelembapan</div>
+        <div class="tabs" id="t-sh">
+          <button class="tab active" onclick="sw('sh',this,'suhu')">Suhu</button>
+          <button class="tab" onclick="sw('sh',this,'humid')">Humid</button>
+          <button class="tab" onclick="sw('sh',this,'both')">Keduanya</button>
+        </div>
+      </div>
+      <canvas id="csh" height="170"></canvas>
+    </div>
+    <div class="panel">
+      <div class="ph">
+        <div class="ptitle">Kelistrikan</div>
+        <div class="tabs" id="t-el">
+          <button class="tab active" onclick="sw('el',this,'daya')">Daya</button>
+          <button class="tab" onclick="sw('el',this,'tegangan')">Tegangan</button>
+          <button class="tab" onclick="sw('el',this,'arus')">Arus</button>
+        </div>
+      </div>
+      <canvas id="cel" height="170"></canvas>
+    </div>
+  </div>
+
+  <div class="logpanel">
+    <div class="logh">
+      <div class="logtitle">Log Historis</div>
+      <div class="ebtns">
+        <button class="btn bcsv" onclick="exportCSV()">Export CSV</button>
+        <button class="btn bxls" onclick="exportXLSX()">Export Excel</button>
+      </div>
+    </div>
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th>Waktu</th><th>Suhu°C</th><th>Humid%</th>
+          <th>V</th><th>A</th><th>W</th><th>KWh/hari</th>
+          <th>IR1</th><th>IR2</th><th>IR3</th><th>IR4</th>
+          <th>RSSI(dBm)</th><th>Delay(ms)</th><th>Throughput(kbps)</th><th>Pkt Loss%</th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="11" class="nodata">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
