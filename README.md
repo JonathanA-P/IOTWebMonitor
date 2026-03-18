@@ -9,7 +9,6 @@ Proyek **IoT Web Monitor** adalah sebuah sistem cerdas yang dibuat untuk memanta
 *   **Smart Analytics**: Dilengkapi kemampuan grafik yang dapat dikendalikan pengguna menggunakan library Chart.js.
 *   **Networking Metrik**: Pantau kualitas jaringan ESP32 langsung melalui panel, meliputi Latency, Throughput, Packet Loss, & RSSI.
 *   **Export Log**: Export data monitor ke bentuk CSV atau Microsoft Excel untuk analisa lebih dalam.
-*   **Modular & Rapih**: Skrip HTML, JavaScript, dan CSS dipisah untuk pengelolaan jangka panjang.
 
 ## Persiapan & Instalasi (Web Dashboard)
 
@@ -44,6 +43,3 @@ Proyek **IoT Web Monitor** adalah sebuah sistem cerdas yang dibuat untuk memanta
    const char* password = "PASSWORD_WIFI_ANDA";
    ```
 3. Compile dan upload kode ke ESP32 Anda. ESP32 otomatis mengkalkulasi *Networking Metrics* (seperti packet loss) ke Firebase di setiap pemanggilannya.
-
-## Lisensi
-Proyek ini gratis untuk dimodifikasi dan dipancarkan sesuai dengan kebutuhan Anda.
